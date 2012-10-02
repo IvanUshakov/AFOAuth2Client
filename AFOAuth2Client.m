@@ -85,26 +85,39 @@ NSString * const kAFOauthRefreshGrantType = @"refresh_token";
 }
 
 - (void)authenticateUsingOAuthWithPath:(NSString *)path
-                            parameters:(NSDictionary *)parameters 
+                            parameters:(NSDictionary *)parameters
                                success:(void (^)(AFOAuthAccount *account))success
                                failure:(void (^)(NSError *error))failure
-{    
+{
     [self clearAuthorizationHeader];
     
     [self postPath:path parameters:parameters success:^ (AFHTTPRequestOperation *operation, id responseObject) {
-        AFOauthAccountCredential *credential = [AFOauthAccountCredential credentialWithOAuthToken:[responseObject valueForKey:@"access_token"] tokenSecret:[parameters valueForKey:@"client_secret"]];
-        [credential setRefreshToken:[responseObject valueForKey:@"refresh_token"] expiration:[NSDate dateWithTimeIntervalSinceNow:[[responseObject valueForKey:@"expires_in"] integerValue]]];
-        AFOAuthAccount *account = [AFOAuthAccount accountWithUsername:[responseObject valueForKey:@"username"] serviceProviderIdentifier:self.serviceProviderIdentifier credential:credential];
+        AFOauthAccountCredential *credential = [AFOauthAccountCredential credentialWithOAuthToken:[responseObject valueForKey:@"access_token"]
+                                                                                      tokenSecret:[parameters valueForKey:@"client_secret"]];
+        NSNumber *expiresIn = [responseObject valueForKey:@"expires_in"];
+        if ([expiresIn isEqual:[NSNull null]]) {
+            expiresIn = @(NSIntegerMax);
+        }
+        [credential setRefreshToken:[responseObject valueForKey:@"refresh_token"]
+                         expiration:[NSDate dateWithTimeIntervalSinceNow:[expiresIn integerValue]]];
+        AFOAuthAccount *account = [AFOAuthAccount accountWithUsername:[responseObject valueForKey:@"username"]
+                                            serviceProviderIdentifier:self.serviceProviderIdentifier
+                                                           credential:credential];
         
         if ([credential isExpired]) {
             if (![[parameters valueForKey:@"grant_type"] isEqualToString:kAFOauthRefreshGrantType]) {
-                [self authenticateUsingOAuthWithPath:path refreshToken:credential.refreshToken clientID:[parameters valueForKey:@"client_id"] secret:[parameters valueForKey:@"client_secret"] success:success failure:failure];
+                [self authenticateUsingOAuthWithPath:path
+                                        refreshToken:credential.refreshToken
+                                            clientID:[parameters valueForKey:@"client_id"]
+                                              secret:[parameters valueForKey:@"client_secret"]
+                                             success:success
+                                             failure:failure];
             } else {
                 if (failure) {
                     failure(nil);
                 }
             }
-        } else {            
+        } else {
             [self setAuthorizationHeaderWithBearerToken:credential.accessToken];
             
             if (success) {
@@ -114,7 +127,7 @@ NSString * const kAFOauthRefreshGrantType = @"refresh_token";
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         if (failure) {
             failure(error);
-        } 
+        }
     }];
 }
 
