@@ -134,6 +134,28 @@ NSString * const kAFOauthRefreshGrantType = @"refresh_token";
     }];
 }
 
+- (void)setAuthorizationHeaderWithToken:(NSString *)token valueFormat:(AFNetworkAuthorizationTokenFormat)format
+{
+	switch (format) {
+		case AFNetworkAuthorizationTokenFormatDefault:
+			[self setDefaultHeader:@"Authorization" value:[NSString stringWithFormat:@"Token token=\"%@\"", token]];
+			break;
+		case AFNetworkAuthorizationTokenFormatSlim:
+			[self setDefaultHeader:@"Authorization" value:[NSString stringWithFormat:@"Token %@", token]];
+			return;
+		case AFNetworkAuthorizationTokenFormatBearer:
+			[self setDefaultHeader:@"Authorization" value:[NSString stringWithFormat:@"Bearer %@", token]];
+			return;
+		default:
+			return;
+	}
+}
+
+- (void)setAuthorizationHeaderWithBearerToken:(NSString *)token
+{
+    [self setAuthorizationHeaderWithToken:token valueFormat:AFNetworkAuthorizationTokenFormatBearer];
+}
+
 @end
 
 #pragma mark -

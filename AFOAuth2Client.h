@@ -26,6 +26,13 @@
 extern NSString * const kAFOAuthResourceOwnerPasswordCredentialsGrantType;
 extern NSString * const kAFOauthRefreshGrantType;
 
+typedef enum {
+	AFNetworkAuthorizationTokenFormatUnkown     = -1,
+    AFNetworkAuthorizationTokenFormatDefault    = 0,  // "Authorization: token token=\"xxx\""
+    AFNetworkAuthorizationTokenFormatSlim		= 1,  // "Authorization: token xxx"
+	AFNetworkAuthorizationTokenFormatBearer     = 2,  // "Authorization: Bearer xxx"
+} AFNetworkAuthorizationTokenFormat;
+
 @class AFOAuthAccount;
 
 @interface AFOAuth2Client : AFHTTPClient
@@ -55,6 +62,9 @@ extern NSString * const kAFOauthRefreshGrantType;
 - (void)revokeTokenUsingOAuthWithPath:(NSString *)path
                          success:(void (^)(AFOAuthAccount *account))success
                          failure:(void (^)(NSError *error))failure;
+
+- (void)setAuthorizationHeaderWithToken:(NSString *)token valueFormat:(AFNetworkAuthorizationTokenFormat)format;
+- (void)setAuthorizationHeaderWithBearerToken:(NSString *)token;
 
 @end
 
