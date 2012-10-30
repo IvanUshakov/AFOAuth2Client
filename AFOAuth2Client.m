@@ -56,7 +56,7 @@ NSString * const kAFOauthRefreshGrantType = @"refresh_token";
                               clientID:(NSString *)clientID 
                                 secret:(NSString *)secret 
                                success:(void (^)(AFOAuthAccount *account))success 
-                               failure:(void (^)(NSError *error))failure
+                               failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
     NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
     [parameters setObject:kAFOAuthResourceOwnerPasswordCredentialsGrantType forKey:@"grant_type"];
@@ -73,7 +73,7 @@ NSString * const kAFOauthRefreshGrantType = @"refresh_token";
                               clientID:(NSString *)clientID 
                                 secret:(NSString *)secret 
                                success:(void (^)(AFOAuthAccount *account))success 
-                               failure:(void (^)(NSError *error))failure
+                               failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
     NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
     [parameters setObject:kAFOauthRefreshGrantType forKey:@"grant_type"];
@@ -87,7 +87,7 @@ NSString * const kAFOauthRefreshGrantType = @"refresh_token";
 - (void)authenticateUsingOAuthWithPath:(NSString *)path
                             parameters:(NSDictionary *)parameters
                                success:(void (^)(AFOAuthAccount *account))success
-                               failure:(void (^)(NSError *error))failure
+                               failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
     [self clearAuthorizationHeader];
     
@@ -114,7 +114,8 @@ NSString * const kAFOauthRefreshGrantType = @"refresh_token";
                                              failure:failure];
             } else {
                 if (failure) {
-                    failure(nil);
+                    //todo: add error
+                    failure(nil, nil);
                 }
             }
         } else {
@@ -126,14 +127,14 @@ NSString * const kAFOauthRefreshGrantType = @"refresh_token";
         }
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         if (failure) {
-            failure(error);
+            failure(operation, error);
         }
     }];
 }
 
 - (void)revokeTokenUsingOAuthWithPath:(NSString *)path
                               success:(void (^)(AFOAuthAccount *account))success
-                              failure:(void (^)(NSError *error))failure
+                              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
     [self deletePath:path parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
         if (success) {
@@ -142,7 +143,7 @@ NSString * const kAFOauthRefreshGrantType = @"refresh_token";
         }
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         if (failure) {
-            failure(error);
+            failure(operation, error);
         }
     }];
 }

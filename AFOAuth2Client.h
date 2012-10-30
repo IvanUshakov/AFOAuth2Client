@@ -45,23 +45,23 @@ typedef enum {
                               clientID:(NSString *)clientID 
                                 secret:(NSString *)secret 
                                success:(void (^)(AFOAuthAccount *account))success 
-                               failure:(void (^)(NSError *error))failure;
+                               failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
 
 - (void)authenticateUsingOAuthWithPath:(NSString *)path
                           refreshToken:(NSString *)refreshToken
                               clientID:(NSString *)clientID 
                                 secret:(NSString *)secret 
                                success:(void (^)(AFOAuthAccount *account))success 
-                               failure:(void (^)(NSError *error))failure;
+                               failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
 
 - (void)authenticateUsingOAuthWithPath:(NSString *)path
                             parameters:(NSDictionary *)parameters 
                                success:(void (^)(AFOAuthAccount *account))success
-                               failure:(void (^)(NSError *error))failure;
+                               failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
 
 - (void)revokeTokenUsingOAuthWithPath:(NSString *)path
                          success:(void (^)(AFOAuthAccount *account))success
-                         failure:(void (^)(NSError *error))failure;
+                         failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
 
 - (void)setAuthorizationHeaderWithToken:(NSString *)token valueFormat:(AFNetworkAuthorizationTokenFormat)format;
 - (void)setAuthorizationHeaderWithBearerToken:(NSString *)token;
